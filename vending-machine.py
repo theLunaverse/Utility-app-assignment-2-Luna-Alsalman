@@ -1,169 +1,206 @@
-import random
-from typing import Dict, Tuple, List
+import random  # Importing the random module (not used in this version, but it could be useful in the future)
+from typing import Dict, Tuple, List  # Importing typing utilities to define type hints for dictionaries, tuples, and lists
 
 class Product:
     # Represents a single product in the vending machine.
     def __init__(self, name: str, price: float, category: str, stock: int = 10):
-        # Initialize product attributes: name, price, category, and stock.
-        self.name = name  # Product name.
-        self.price = price  # Product price.
-        self.category = category  # Product category (e.g., Drinks, Snacks).
-        self.stock = stock  # Initial stock quantity (default is 10).
-    
+        # Initialize the product's attributes: name, price, category, and stock (default to 10).
+        self.name = name  # Product name
+        self.price = price  # Product price
+        self.category = category  # Product category (e.g., Drinks, Snacks, etc.)
+        self.stock = stock  # Product stock (default is 10)
+
     def is_available(self) -> bool:
-        # Check if the product is in stock by verifying if stock > 0.
+        # Check if the product is available by verifying if stock > 0
         return self.stock > 0
-    
+
     def reduce_stock(self):
-        # Decrease the product stock by 1 if stock is greater than 0.
+        # Reduces the stock of the product by 1 if the stock is greater than 0
         if self.stock > 0:
-            self.stock -= 1
+            self.stock -= 1  # Decrease stock by 1
 
 
 class VendingMachine:
-
-    #Advanced Vending Machine with multiple features.
+    # Language dictionaries for translation
+    LANGUAGES = {
+        'english': {  # English language translations
+            'welcome': "Welcome to the Advanced Vending Machine!",
+            'invalid_choice': "Invalid product number. Please try again.",
+            'sold_out': "Sorry, {product} is SOLD OUT!",
+            'insufficient_payment': "Insufficient payment. You need at least ${amount:.2f}",
+            'payment_prompt': "Enter payment amount: $",
+            'thank_you': "Thank you for using the Advanced Vending Machine. Goodbye!",
+            'yes_no_prompt': "Would you like to buy another item? (yes/no): ",
+            'add_on_prompt': "Would you like to buy an add-on? (yes/no): ",
+            'recommended_addons': "Recommended add-ons:",
+            'no_stock': "Stock: {stock}",
+            'select_product': "Enter the number of the product you want: ",
+            'enter_payment': "{product} costs ${price:.2f}",
+        },
+        'arabic': {  # Arabic language translations
+            'welcome': "مرحبًا بك في جهاز البيع المتقدم!",
+            'invalid_choice': "رقم المنتج غير صالح. يرجى المحاولة مرة أخرى.",
+            'sold_out': "عذرًا، {product} نفد من المخزون!",
+            'insufficient_payment': "المبلغ غير كافٍ. تحتاج إلى دفع على الأقل ${amount:.2f}",
+            'payment_prompt': "أدخل مبلغ الدفع: $",
+            'thank_you': "شكرًا لاستخدامك جهاز البيع المتقدم. وداعًا!",
+            'yes_no_prompt': "هل ترغب في شراء عنصر آخر؟ (نعم/لا): ",
+            'add_on_prompt': "هل ترغب في شراء إضافة؟ (نعم/لا): ",
+            'recommended_addons': "الإضافات الموصى بها:",
+            'no_stock': "المخزون: {stock}",
+            'select_product': "أدخل رقم المنتج الذي ترغب في اختياره: ",
+            'enter_payment': "{product} يكلف ${price:.2f}",
+        }
+    }
 
     def __init__(self):
-        # Initialize the vending machine with predefined products and suggestions.
+        self.language = 'english'  # Default language is set to English
+        # Initializing a dictionary with product codes as keys and Product objects as values
         self.products: Dict[str, Product] = {
-            "1": Product("orange juice", 2.99, "Drinks"),  # Key '1' maps to orange juice in the Drinks category.
-            "2": Product("apple juice", 2.99, "Drinks"),   # Key '2' maps to apple juice in the Drinks category.
-            "3": Product("salty chips", 1.50, "Snacks"),  # Key '3' maps to salty chips in the Snacks category.
-            "4": Product("spicy chips", 1.50, "Snacks"),  # Key '4' maps to spicy chips in the Snacks category.
-            "5": Product("kitkat", 2.50, "Chocolate"),    # Key '5' maps to KitKat in the Chocolate category.
-            "6": Product("water", 1.25, "Drinks"),        # Key '6' maps to water in the Drinks category.
-            "7": Product("energy drink", 3.25, "Drinks"), # Key '7' maps to energy drink in the Drinks category.
-            "8": Product("chocolate bar", 2.75, "Chocolate"),  # Key '8' maps to a chocolate bar in the Chocolate category.
-            "9": Product("cookies", 1.75, "Snacks")       # Key '9' maps to cookies in the Snacks category.
+            "1": Product("orange juice", 2.99, "Drinks"),
+            "2": Product("apple juice", 2.99, "Drinks"),
+            "3": Product("salty chips", 1.50, "Snacks"),
+            "4": Product("spicy chips", 1.50, "Snacks"),
+            "5": Product("kitkat", 2.50, "Chocolate"),
+            "6": Product("water", 1.25, "Drinks"),
+            "7": Product("energy drink", 3.25, "Drinks"),
+            "8": Product("chocolate bar", 2.75, "Chocolate"),
+            "9": Product("cookies", 1.75, "Snacks")
         }
-        
-        # Define product category-based suggestions.
+
+        # Suggesting additional products based on the category of the selected product
         self.purchase_suggestions = {
-            "Drinks": ["cookies", "chocolate bar"],  # Suggest Snacks and Chocolate for Drinks purchases.
-            "Snacks": ["water", "orange juice"],     # Suggest Drinks for Snacks purchases.
-            "Chocolate": ["apple juice", "energy drink"]  # Suggest Drinks for Chocolate purchases.
+            "Drinks": ["cookies", "chocolate bar"],
+            "Snacks": ["water", "orange juice"],
+            "Chocolate": ["apple juice", "energy drink"]
         }
-    
+
+    def translate(self, text_key: str, **kwargs) -> str:
+        # This method returns the translated text based on the current selected language.
+        translation = self.LANGUAGES[self.language].get(text_key, text_key)
+        # It also formats any dynamic content (like prices or stock) if there are placeholders
+        return translation.format(**kwargs) if kwargs else translation
+
+    def set_language(self):
+        # This method asks the user to choose a language at the start.
+        while True:
+            language_choice = input("Select language (english/arabic): ").strip().lower()  # Prompt the user for language
+            if language_choice in self.LANGUAGES:  # Check if the entered language is valid
+                self.language = language_choice  # Set the language to the user's choice
+                print(self.translate('welcome'))  # Print the welcome message in the selected language
+                break
+            else:
+                print("Invalid language choice. Please select either 'english' or 'arabic'.")  # If invalid, prompt again
+
     def display_products(self):
-        # Display all products categorized by their type.
+        # This method displays the product menu in a categorized format
         print("\n--- VENDING MACHINE MENU ---")
-        categories = {}  # Dictionary to group products by category.
-        
+        categories = {}  # Create an empty dictionary to hold products categorized by type
+
         for code, product in self.products.items():
-            # Group products under their respective categories.
-            if product.category not in categories:
+            if product.category not in categories:  # If the category is not in the dictionary, add it
                 categories[product.category] = []
-            categories[product.category].append((code, product))
-        
+            categories[product.category].append((code, product))  # Group products under their respective categories
+
         for category, items in categories.items():
-            # Display each category and its available products.
-            print(f"\n{category.upper()} CATEGORY:")
+            print(f"\n{category.upper()} CATEGORY:")  # Print category header (e.g., DRINKS CATEGORY)
             for code, product in items:
                 if product.is_available():
-                    print(f"{code}: {product.name.capitalize()} - ${product.price:.2f} (Stock: {product.stock})")
+                    # Display product details if the product is available
+                    print(f"{code}: {product.name.capitalize()} - ${product.price:.2f} ({self.translate('no_stock', stock=product.stock)})")
                 else:
-                    print(f"{code}: {product.name.capitalize()} - SOLD OUT")
-    
+                    # If the product is sold out, show that it's unavailable
+                    print(f"{code}: {product.name.capitalize()} - {self.translate('sold_out', product=product.name)}")
+
     def select_product(self) -> str:
-        # Prompt the user to select a product and validate the input.
+        # This method allows the user to select a product by entering the corresponding code
         while True:
             try:
-                self.display_products()  # Show the menu to the user.
-                choice = input("\nEnter the number of the product you want: ")
+                self.display_products()  # Display the product menu
+                choice = input(self.translate('select_product'))  # Ask the user to enter the product code
 
-                # Check if the entered choice is a valid product number (key exists in self.products).
-                if choice not in self.products:
-                    print("Invalid product number. Please try again.")  # Error message if the product number is invalid.
-                    continue  # Ask for the input again if the product number is invalid.
-
-                product = self.products[choice]  # Get the product object using the selected code.
-
-                # Check if the selected product is available (stock > 0).
-                if not product.is_available():
-                    print(f"Sorry, {product.name} is SOLD OUT!")  # Inform the user if the product is sold out.
-                    continue  # Ask for the input again if the product is sold out.
-
-                return choice  # Return the valid product code if the product exists and is in stock.
-
-            except ValueError:
-                # Handle any unexpected errors that might occur during input conversion.
-                print("Error: Please enter a valid product number.")
-    
-    def suggest_purchase(self, selected_product: Product) -> List[Product]:
-        # Suggest additional products based on the selected product's category.
-        suggestions = []  # List to store suggested products.
-        suggested_names = self.purchase_suggestions.get(selected_product.category, [])
-        
-        for code, product in self.products.items():
-            # Add products to the suggestion list if they match and are in stock.
-            if product.name in suggested_names and product.is_available():
-                suggestions.append(product)
-        
-        return suggestions  # Return the list of suggested products.
-    
-    def process_payment(self, product: Product) -> bool:
-        # Process payment for the selected product and check for sufficient funds.
-        while True:
-            try:
-                print(f"\n{product.name.capitalize()} costs ${product.price:.2f}")
-                payment = float(input("Enter payment amount: $"))
-                
-                if payment < product.price:  # Verify if payment is sufficient.
-                    print(f"Insufficient payment. You need at least ${product.price:.2f}")
+                if choice not in self.products:  # If the choice is invalid (not in the products dictionary)
+                    print(self.translate('invalid_choice'))  # Show an invalid choice message
                     continue
-                
-                change = payment - product.price  # Calculate the change.
-                print(f"\nDispensing {product.name.capitalize()}!")
-                print(f"Change returned: ${change:.2f}")
-                
-                product.reduce_stock()  # Reduce the stock of the purchased product.
-                
-                return True  # Indicate a successful transaction.
-            
+
+                if not self.products[choice].is_available():  # If the selected product is out of stock
+                    print(self.translate('sold_out', product=self.products[choice].name))  # Show sold out message
+                    continue
+
+                return choice  # Return the valid product code if valid and available
+
             except ValueError:
-                # Handle cases where the payment input is not a valid number.
-                print("Error: Please enter a valid payment amount.")
-    
+                print("Please enter a valid product number.")  # Handle invalid inputs
+
+    def suggest_purchase(self, selected_product: Product) -> List[Product]:
+        # This method suggests additional products based on the selected product's category
+        suggestions = []  # Create an empty list to store suggested products
+        suggested_names = self.purchase_suggestions.get(selected_product.category, [])  # Get suggestions for the product's category
+
+        for code, product in self.products.items():
+            if product.name in suggested_names and product.is_available():
+                suggestions.append(product)  # Add products to the suggestion list if they match and are in stock
+
+        return suggestions  # Return the list of suggested products
+
+    def process_payment(self, product: Product) -> bool:
+        # This method handles payment for the selected product
+        while True:
+            try:
+                print(self.translate('enter_payment', product=product.name.capitalize(), price=product.price))  # Show product price
+                payment = float(input(self.translate('payment_prompt')))  # Ask the user to input payment amount
+
+                if payment < product.price:  # If payment is less than the product price
+                    print(self.translate('insufficient_payment', amount=product.price))  # Show insufficient payment message
+                    continue
+
+                change = payment - product.price  # Calculate the change
+                print(f"\n{self.translate('dispensing')} {product.name.capitalize()}!")  # Dispense the product
+                print(f"Change returned: ${change:.2f}")  # Show the change returned
+
+                product.reduce_stock()  # Reduce the stock of the purchased product
+
+                return True  # Return True indicating the transaction was successful
+
+            except ValueError:
+                print("Please enter a valid payment amount.")  # Handle invalid input for payment
+
     def get_yes_no_input(self, prompt: str) -> bool:
-        # Prompt the user for a yes or no answer and validate the input.
+        # This method asks the user for a yes/no answer and validates the input
         while True:
-            response = input(prompt).lower().strip()  # Get user input.
-            if response == 'yes':
-                return True  # Return True if the input is 'yes'.
-            elif response == 'no':
-                return False  # Return False if the input is 'no'.
+            response = input(prompt).lower().strip()  # Get the response, convert to lowercase, and remove extra spaces
+            if response == 'yes':  # If the response is 'yes'
+                return True  # Return True
+            elif response == 'no':  # If the response is 'no'
+                return False  # Return False
             else:
-                # Handle invalid input by prompting again.
-                print("Invalid input. Please enter 'yes' or 'no'.")
-    
+                print("Invalid input. Please enter 'yes' or 'no'.")  # Handle invalid input
+
     def run(self):
-        # Run the main loop for the vending machine operations.
-        print("Welcome to Luna's Vending Machine!")
-        
+        # This method runs the main logic of the vending machine
+        self.set_language()  # Prompt the user to select a language
+
         while True:
-            selected_code = self.select_product()  # Select a product.
-            selected_product = self.products[selected_code]
-            
-            if self.process_payment(selected_product):  # Process payment for the selected product.
-                suggestions = self.suggest_purchase(selected_product)  # Get purchase suggestions.
+            selected_code = self.select_product()  # Prompt the user to select a product
+            selected_product = self.products[selected_code]  # Get the selected product object
+
+            if self.process_payment(selected_product):  # Process payment for the selected product
+                suggestions = self.suggest_purchase(selected_product)  # Get suggested products
                 if suggestions:
-                    print("\nRecommended add-ons:")
+                    print(self.translate('recommended_addons'))  # Show recommended add-ons
                     for suggestion in suggestions:
-                        print(f"- {suggestion.name.capitalize()} (${suggestion.price:.2f})")
-                    
-                    if self.get_yes_no_input("Would you like to buy an add-on? (yes/no): "):
-                        additional_code = self.select_product()  # Allow user to select an add-on.
-                        additional_product = self.products[additional_code]
-                        self.process_payment(additional_product)
-            
-            if not self.get_yes_no_input("\nWould you like to buy another item? (yes/no): "):
-                # Exit the loop if the user does not want another transaction.
-                print("Thank you for using Luna's Vending Machine. Goodbye!")
+                        print(f"- {suggestion.name.capitalize()} (${suggestion.price:.2f})")  # Display each suggestion
+
+                    if self.get_yes_no_input(self.translate('add_on_prompt')):  # Ask if they want to buy an add-on
+                        additional_code = self.select_product()  # Let the user select an additional product
+                        additional_product = self.products[additional_code]  # Get the additional product
+                        self.process_payment(additional_product)  # Process payment for the additional product
+
+            if not self.get_yes_no_input(self.translate('yes_no_prompt')):  # Ask if they want to buy another item
+                print(self.translate('thank_you'))  # Thank the user and exit the loop
                 break
 
 
-# Run the vending machine
 if __name__ == "__main__":
-    vending_machine = VendingMachine()  # Create an instance of VendingMachine.
-    vending_machine.run()  # Start the vending machine application.
+    vending_machine = VendingMachine()  # Create an instance of the VendingMachine class
+    vending_machine.run()  # Start the vending machine application
