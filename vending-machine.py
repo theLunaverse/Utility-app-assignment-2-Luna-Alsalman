@@ -2,7 +2,7 @@ import random
 from typing import Dict, Tuple, List
 
 class Product:
-    #Represents a single product in the vending machine.
+    # Represents a single product in the vending machine.
     def __init__(self, name: str, price: float, category: str, stock: int = 10):
         # Initialize product attributes: name, price, category, and stock.
         self.name = name  # Product name.
@@ -21,9 +21,9 @@ class Product:
 
 
 class VendingMachine:
-    """
-    Advanced Vending Machine with multiple features.
-    """
+
+    #Advanced Vending Machine with multiple features.
+
     def __init__(self):
         # Initialize the vending machine with predefined products and suggestions.
         self.products: Dict[str, Product] = {
@@ -71,20 +71,24 @@ class VendingMachine:
             try:
                 self.display_products()  # Show the menu to the user.
                 choice = input("\nEnter the number of the product you want: ")
-                
-                if choice not in self.products:  # Check if the input is valid.
-                    print("Invalid product number. Please try again.")
-                    continue
-                
-                if not self.products[choice].is_available():  # Check if the product is in stock.
-                    print(f"Sorry, {self.products[choice].name} is SOLD OUT!")
-                    continue
-                
-                return choice  # Return the valid product code.
-            
+
+                # Check if the entered choice is a valid product number (key exists in self.products).
+                if choice not in self.products:
+                    print("Invalid product number. Please try again.")  # Error message if the product number is invalid.
+                    continue  # Ask for the input again if the product number is invalid.
+
+                product = self.products[choice]  # Get the product object using the selected code.
+
+                # Check if the selected product is available (stock > 0).
+                if not product.is_available():
+                    print(f"Sorry, {product.name} is SOLD OUT!")  # Inform the user if the product is sold out.
+                    continue  # Ask for the input again if the product is sold out.
+
+                return choice  # Return the valid product code if the product exists and is in stock.
+
             except ValueError:
-                # Handle cases where input is not a valid string.
-                print("Please enter a valid product number.")
+                # Handle any unexpected errors that might occur during input conversion.
+                print("Error: Please enter a valid product number.")
     
     def suggest_purchase(self, selected_product: Product) -> List[Product]:
         # Suggest additional products based on the selected product's category.
@@ -119,7 +123,7 @@ class VendingMachine:
             
             except ValueError:
                 # Handle cases where the payment input is not a valid number.
-                print("Please enter a valid payment amount.")
+                print("Error: Please enter a valid payment amount.")
     
     def get_yes_no_input(self, prompt: str) -> bool:
         # Prompt the user for a yes or no answer and validate the input.
@@ -135,7 +139,7 @@ class VendingMachine:
     
     def run(self):
         # Run the main loop for the vending machine operations.
-        print("Welcome to the Advanced Vending Machine!")
+        print("Welcome to Luna's Vending Machine!")
         
         while True:
             selected_code = self.select_product()  # Select a product.
@@ -155,7 +159,7 @@ class VendingMachine:
             
             if not self.get_yes_no_input("\nWould you like to buy another item? (yes/no): "):
                 # Exit the loop if the user does not want another transaction.
-                print("Thank you for using the Advanced Vending Machine. Goodbye!")
+                print("Thank you for using Luna's Vending Machine. Goodbye!")
                 break
 
 
