@@ -88,8 +88,14 @@ class VendingMachine:
             print("Invalid payment input. Please enter a valid number.")
             return self.process_payment(product)
 
+    def check_stock_exists(self):
+        if all(not product.is_in_stock() for product in self.products.values()):
+            print("All products are out of stock. The vending machine cannot be used at this time.")
+            exit()
+
     def run(self):
         self.set_language()
+        self.check_stock_exists()
         while True:
             product = self.select_product()
             self.process_payment(product)
