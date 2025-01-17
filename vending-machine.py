@@ -8,11 +8,15 @@ class Product:
     def reduce_stock(self):
         self.stock -= 1
 
+    def is_in_stock(self):
+        return self.stock > 0
+
 class VendingMachine:
     LANGUAGES = {
         'english': {
             'welcome': "Welcome to the Vending Machine!",
             'invalid_choice': "Invalid choice. Please select a valid product number.",
+            'out_of_stock': "Sorry, this product is out of stock. Please choose another.",
             'insufficient_payment': "Insufficient payment. Please try again.",
             'payment_prompt': "Enter payment amount: $",
             'dispensing': "Dispensing",
@@ -22,6 +26,7 @@ class VendingMachine:
         'arabic': {
             'welcome': "مرحبا بك في جهاز البيع!",
             'invalid_choice': "خيار غير صحيح. يرجى اختيار رقم منتج صحيح.",
+            'out_of_stock': "عذرًا، هذا المنتج غير متوفر. يرجى اختيار منتج آخر.",
             'insufficient_payment': "الدفع غير كافِ. يرجى المحاولة مرة أخرى.",
             'payment_prompt': "أدخل مبلغ الدفع: $",
             'dispensing': "جاري توزيع",
@@ -61,7 +66,11 @@ class VendingMachine:
         self.display_products()
         try:
             choice = input("Enter the number of the product you want: ").strip()
-            return self.products[choice]
+            product = self.products[choice]
+            if not product.is_in_stock():
+                print(self.translate('out_of_stock'))
+                return self.select_product()
+            return product
         except KeyError:
             print(self.translate('invalid_choice'))
             return self.select_product()
