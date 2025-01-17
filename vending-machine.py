@@ -37,9 +37,16 @@ class VendingMachine:
 
     def process_payment(self, product: Product):
         print(f"{product.name.capitalize()} costs ${product.price:.2f}")
-        payment = float(input("Enter payment amount: $"))
-        print(f"Dispensing {product.name.capitalize()}! Change: ${payment - product.price:.2f}")
-        product.reduce_stock()
+        try:
+            payment = float(input("Enter payment amount: $"))
+            if payment < product.price:
+                print("Insufficient payment. Please try again.")
+                return self.process_payment(product)
+            print(f"Dispensing {product.name.capitalize()}! Change: ${payment - product.price:.2f}")
+            product.reduce_stock()
+        except ValueError:
+            print("Invalid payment input. Please enter a valid number.")
+            return self.process_payment(product)
 
     def run(self):
         while True:
