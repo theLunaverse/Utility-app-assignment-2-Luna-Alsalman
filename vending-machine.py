@@ -28,8 +28,12 @@ class VendingMachine:
 
     def select_product(self):
         self.display_products()
-        choice = input("Enter the number of the product you want: ").strip()
-        return self.products[choice]
+        try:
+            choice = input("Enter the number of the product you want: ").strip()
+            return self.products[choice]
+        except KeyError:
+            print("Invalid choice. Please select a valid product number.")
+            return self.select_product()
 
     def process_payment(self, product: Product):
         print(f"{product.name.capitalize()} costs ${product.price:.2f}")
