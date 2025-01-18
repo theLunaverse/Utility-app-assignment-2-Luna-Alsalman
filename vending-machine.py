@@ -129,9 +129,23 @@ class VendingMachine:
                     print(f"{code}: {product.name} - SOLD OUT")
 
     def select_product(self) -> str:
-        self.display_products()
-        choice = input(self.translate('select_product'))
-        return choice
+        while True:
+            try:
+                self.display_products()
+                choice = input(self.translate('select_product'))
+
+                if choice not in self.products:
+                    print(self.translate('invalid_choice'))
+                    continue
+
+                if not self.products[choice].is_available():
+                    print(self.translate('sold_out', product=self.products[choice].name))
+                    continue
+
+                return choice
+
+            except ValueError:
+                print("Please enter a valid product number.")
 
     def suggest_purchase(self, selected_product: Product) -> List[Product]:
         suggestions = []
