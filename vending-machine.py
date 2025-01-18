@@ -107,9 +107,14 @@ class VendingMachine:
         return translation.format(**kwargs) if kwargs else translation
 
     def set_language(self):
-        language_choice = input("Select language (english/arabic): ").strip().lower()
-        self.language = language_choice
-        self.initialize_products()
+        while True:
+            language_choice = input("Select language (english/arabic): ").strip().lower()
+            if language_choice in self.LANGUAGES:
+                self.language = language_choice
+                self.initialize_products()
+                break
+            else:
+                print("Invalid language choice. Please select either 'english' or 'arabic'.")
 
     def display_products(self):
         print(f"\n{self.translate('menu_header')}")
