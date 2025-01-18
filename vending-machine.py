@@ -1,3 +1,5 @@
+import signal
+
 class Product:
     def __init__(self, name: str, price: float, category: str, stock: int = 10):
         self.name = name
@@ -10,6 +12,14 @@ class Product:
 
     def is_in_stock(self):
         return self.stock > 0
+
+class TimeoutException(Exception):
+    pass
+
+def timeout_handler(signum, frame):
+    raise TimeoutException("Input timed out!")
+
+signal.signal(signal.SIGALRM, timeout_handler)
 
 class VendingMachine:
     LANGUAGES = {
@@ -53,10 +63,17 @@ class VendingMachine:
         return self.LANGUAGES[self.language].get(key, key)
 
     def set_language(self):
-        choice = input("Select language (english/arabic): ").strip().lower()
-        if choice in self.LANGUAGES:
-            self.language = choice
-        print(self.translate('welcome'))
+        try:
+            signal.alarm(10)  # Set a timeout of 10 seconds
+            choice = input("Select language (english/arabic): ").strip().lower()
+            signal.alarm(0)  # Disable the alarm
+            if choice in self.LANGUAGES:
+                self.language = choice
+            print(self.translate('welcome'))
+        except TimeoutException:
+            print("Input timed out. Defaulting to English.")
+        finally:
+            signal.alarm(0)  # Ensure the alarm is turned off
 
     def display_products(self):
         for key, product in self.products.items():
