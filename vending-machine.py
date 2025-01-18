@@ -158,15 +158,24 @@ class VendingMachine:
         return suggestions
 
     def process_payment(self, product: Product) -> bool:
-        print(self.translate('enter_payment', product=product.name, price=product.price))
-        payment = float(input(self.translate('payment_prompt')))
-        
-        change = payment - product.price
-        print(f"\n{self.translate('dispensing')} {product.name}!")
-        print(f"Change returned: ${change:.2f}")
-        
-        product.reduce_stock()
-        return True
+        while True:
+            try:
+                print(self.translate('enter_payment', product=product.name, price=product.price))
+                payment = float(input(self.translate('payment_prompt')))
+
+                if payment < product.price:
+                    print(self.translate('insufficient_payment', amount=product.price))
+                    continue
+
+                change = payment - product.price
+                print(f"\n{self.translate('dispensing')} {product.name}!")
+                print(f"Change returned: ${change:.2f}")
+
+                product.reduce_stock()
+                return True
+
+            except ValueError:
+                print("Please enter a valid payment amount.")
 
     def get_yes_no_input(self, prompt: str) -> bool:
         response = input(prompt).lower().strip()
