@@ -93,13 +93,20 @@ class VendingMachine:
             print("All products are out of stock. The vending machine cannot be used at this time.")
             exit()
 
+    def get_valid_yes_no(self, prompt):
+        while True:
+            response = input(prompt).strip().lower()
+            if response in ["yes", "no"]:
+                return response == "yes"
+            print("Invalid input. Please enter 'yes' or 'no'.")
+
     def run(self):
         self.set_language()
         self.check_stock_exists()
         while True:
             product = self.select_product()
             self.process_payment(product)
-            if input(self.translate('another_item')).strip().lower() != 'yes':
+            if not self.get_valid_yes_no(self.translate('another_item')):
                 print(self.translate('thank_you'))
                 break
 
