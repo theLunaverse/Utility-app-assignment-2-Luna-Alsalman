@@ -183,8 +183,14 @@ class VendingMachine:
                 print("Please enter a valid payment amount.")
 
     def get_yes_no_input(self, prompt: str) -> bool:
-        response = input(prompt).lower().strip()
-        return response in ['yes', 'نعم']
+        while True:
+            response = input(prompt).lower().strip()
+            if response in ['yes', 'نعم']:
+                return True
+            elif response in ['no', 'لا']:
+                return False
+            else:
+                print("Invalid input. Please enter 'yes'/'نعم' or 'no'/'لا'.")
 
     def run(self):
         print(f"{self.translate('welcome')}\n")
