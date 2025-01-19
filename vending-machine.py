@@ -86,14 +86,14 @@ class VendingMachine:
         self.products: Dict[str, Product] = {
             "1": Product(self.translate('orange_juice'), 2.99, self.translate('drinks')),
             "2": Product(self.translate('apple_juice'), 2.99, self.translate('drinks')),
-            "3": Product(self.translate('salty_chips'), 1.50, self.translate('snacks')),
-            "4": Product(self.translate('takkis'), 1.50, self.translate('snacks')),
-            "5": Product(self.translate('kitkat'), 2.50, self.translate('chocolate')),
-            "6": Product(self.translate('water'), 1.25, self.translate('drinks')),
-            "7": Product(self.translate('professor_peppy'), 5.75, self.translate('drinks')),
-            "8": Product(self.translate('chocolate_bar'), 2.75, self.translate('chocolate')),
-            "9": Product(self.translate('cookies'), 1.75, self.translate('snacks')),
-            "10": Product(self.translate('dr_pepper'), 10, self.translate('drinks'))
+            "6": Product(self.translate('salty_chips'), 1.50, self.translate('snacks')),
+            "7": Product(self.translate('takkis'), 1.50, self.translate('snacks')),
+            "9": Product(self.translate('kitkat'), 2.50, self.translate('chocolate')),
+            "3": Product(self.translate('water'), 1.25, self.translate('drinks')),
+            "4": Product(self.translate('professor_peppy'), 5.75, self.translate('drinks')),
+            "10": Product(self.translate('chocolate_bar'), 2.75, self.translate('chocolate')),
+            "8": Product(self.translate('cookies'), 1.75, self.translate('snacks')),
+            "5": Product(self.translate('dr_pepper'), 10, self.translate('drinks'))
         }
 
         self.purchase_suggestions = {
